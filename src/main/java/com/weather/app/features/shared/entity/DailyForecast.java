@@ -1,6 +1,8 @@
 package com.weather.app.features.shared.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -12,6 +14,8 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 @Entity
+@Getter
+@Setter
 @Table(name = "daily_forecast")
 public class DailyForecast {
 

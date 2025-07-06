@@ -13,6 +13,7 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
+@Table(name = "daily_forecast_units")
 public class DailyForecastUnits {
 
     @Id

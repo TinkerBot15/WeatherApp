@@ -3,8 +3,10 @@ package com.weather.app.features.shared.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.weather.app.features.shared.entity.DailyForecast;
 import com.weather.app.features.shared.entity.DailyForecastUnits;
 import com.weather.app.features.shared.entity.Location;
+import com.weather.app.features.shared.repository.DailyForecastRepository;
 import com.weather.app.features.shared.repository.DailyForecastUnitsRepository;
 import com.weather.app.features.shared.repository.LocationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 @Component
@@ -20,6 +23,9 @@ public class DailyForecastService {
 
         @Autowired
         private LocationRepository locationRepository;
+
+        @Autowired
+        private DailyForecastRepository dailyForecastRepository;
 
         @Autowired
         private DailyForecastUnitsRepository dailyForecastUnitsRepository;
@@ -30,7 +36,7 @@ public class DailyForecastService {
         ObjectMapper objectMapper = new ObjectMapper();
 
 
-        public void createDailyForecast() throws JsonProcessingException {
+        public void fetchDailyForecastFromExternalApi() throws JsonProcessingException {
                 ArrayList<Location> locations = (ArrayList<Location>) locationRepository.findAll();
 
                 for (Location location : locations) {
@@ -46,42 +52,65 @@ public class DailyForecastService {
                         );
 
                         String rawJson = response.getBody();
+                        JsonNode root = objectMapper.readTree(rawJson);
+                        saveDailyForecasts(root, location);
+                }
+        }
 
-                        JsonNode node = objectMapper.readTree(rawJson);
+        public void saveDailyForecasts(JsonNode root, Location location) {
+                JsonNode daily = root.path("daily");
+                JsonNode units = root.path("daily_units");
+
+                int forecastCount = daily.path("time").size();
+
+                for (int i = 0; i < forecastCount; i++) {
+
+                        DailyForecast forecast = new DailyForecast();
+
+                        forecast.setLocation(location);
+
+                        forecast.setRecordedDate(LocalDate.parse(daily.path("time").get(i).asText()));
+
+                        forecast.setTemperature(daily.path("temperature_2m_max").get(i).asDouble());
+
+                        forecast.setRelative_humidity(daily.path("relative_humidity_2m_max").get(i).asInt());
+
+                        forecast.setDewPoint(daily.path("dew_point_2m_max").get(i).asDouble());
+
+                        forecast.setCloudCover(daily.path("cloud_cover_max").get(i).asInt());
+
+                        forecast.setRain(daily.path("rain_sum").get(i).asDouble());
+
+                        forecast.setWeather_code(daily.path("weather_code").get(i).asInt());
+
+                        dailyForecastRepository.save(forecast);
 
                         DailyForecastUnits dailyForecastUnits = new DailyForecastUnits();
 
-                        int utcOffsetSeconds = node.get("utc_offset_seconds").asInt();
-                        dailyForecastUnits.setUtcOffsetSeconds(utcOffsetSeconds);
+                        dailyForecastUnits.setUtcOffsetSeconds(root.path("utc_offset_seconds").asInt());
 
-                        String timeZone = node.get("timezone").asText();
-                        dailyForecastUnits.setTimeZone(timeZone);
+                        dailyForecastUnits.setTimeZone(root.path("timezone").asText());
 
-                        String timeZoneAbbrev = node.get("timezone_abbreviation").asText();
-                        dailyForecastUnits.setTimezoneAbbreviation(timeZoneAbbrev);
+                        dailyForecastUnits.setTimezoneAbbreviation(root.path("timezone_abbreviation").asText());
 
-                        int elevation = node.get("elevation").asInt();
-                        dailyForecastUnits.setElevation(elevation);
+                        dailyForecastUnits.setElevation(root.path("elevation").asInt());
 
-                        String timeUnit = node.get("time_unit").asText();
-                        dailyForecastUnits.setTimeUnit(timeUnit);
+                        dailyForecastUnits.setTimeUnit(units.path("time").asText());
 
-                        String weatherCodeUnit = node.get("weather_code_unit").asText();
-                        dailyForecastUnits.setWeatherCodeUnit(weatherCodeUnit);
+                        dailyForecastUnits.setWeatherCodeUnit(units.path("weather_code").asText());
 
-                        String temperatureUnit = node.get("temperature_unit").asText();
-                        dailyForecastUnits.setTemperatureUnit(temperatureUnit);
+                        dailyForecastUnits.setTemperatureUnit(units.path("temperature_2m_max").asText());
 
-                        String rain = node.get("rain_sum_unit").asText();
-                        dailyForecastUnits.setRainSumUnit(rain);
+                        dailyForecastUnits.setRainSumUnit(units.path("rain_sum").asText());
 
-                        String relativeHumidity = node.get("relative_humidity_unit").asText();
-                        dailyForecastUnits.setRelativeHumidityUnit(relativeHumidity);
+                        dailyForecastUnits.setRelativeHumidityUnit(units.path("relative_humidity_2m_max").asText());
 
-                        String cloudCoverUnit = node.get("cloud_cover_unit").asText();
-                        dailyForecastUnits.setCloudCoverUnit(cloudCoverUnit);
+                        dailyForecastUnits.setCloudCoverUnit(units.path("cloud_cover_max").asText());
+
+                        dailyForecastUnits.setDailyForecast(forecast);
 
                         dailyForecastUnitsRepository.save(dailyForecastUnits);
                 }
         }
+
 }
