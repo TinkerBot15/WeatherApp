@@ -1,4 +1,4 @@
-package com.weather.app.features.shared.entity;
+package com.weather.app.features.forecast.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -12,7 +12,9 @@ import java.util.UUID;
 @Entity
 @Getter
 @Setter
-public class HourlyForecastUnits {
+@Table(name = "daily_forecast_units")
+public class DailyForecastUnits {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -21,23 +23,22 @@ public class HourlyForecastUnits {
     private String uuid;
 
     @OneToOne
-    @JoinColumn(name="hour_forecast_id", referencedColumnName = "id")
-    private HourForecast hourlyForecast;
+    @JoinColumn(name="daily_forecast_id", referencedColumnName = "id")
+    private DailyForecast dailyForecast;
 
     @Column(name = "utc_offset_seconds", nullable = false)
     private int utcOffsetSeconds;
 
-    @Column(nullable = false)
-    private String timezone;
+    @Column(name="time_zone")
+    private String timeZone;
 
     @Column(name = "timezone_abbreviation")
     private String timezoneAbbreviation;
 
-    @Column(nullable = false)
     private int elevation;
 
-    @Column(name = "unit_time")
-    private String unitTime;
+    @Column(name = "time_unit")
+    private String timeUnit;
 
     @Column(name = "weather_code_unit")
     private String weatherCodeUnit;
@@ -67,5 +68,7 @@ public class HourlyForecastUnits {
 
     @PrePersist
     public void generateUuid() { this.uuid = UUID.randomUUID().toString(); }
+
+
 
 }

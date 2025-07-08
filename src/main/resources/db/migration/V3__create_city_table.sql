@@ -1,0 +1,11 @@
+CREATE TABLE cities (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    uuid VARCHAR(36) NOT NULL,
+    city_name VARCHAR(255),
+    state_id BIGINT,
+    latitude DOUBLE,
+    longitude DOUBLE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (state_id) REFERENCES states(id)
+);

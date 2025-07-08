@@ -10,8 +10,8 @@
 		<relativePath/>
 	</parent>
 
-	<groupId>com.weatherapp</groupId>
-	<artifactId>WeatherForecastApplication</artifactId>
+	<groupId>com.weather</groupId>
+	<artifactId>app</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>WeatherForecastApplication</name>
 	<description>Demo project for Spring Boot</description>
@@ -76,16 +76,46 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>1.18.30</version> <!-- or latest -->
-			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
 		</dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<annotationProcessorPaths>
+						<path>
+							<groupId>org.projectlombok</groupId>
+							<artifactId>lombok</artifactId>
+						</path>
+					</annotationProcessorPaths>
+				</configuration>
+			</plugin>
+			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<configuration>
+					<excludes>
+						<groupId>org.projectlombok</groupId>
+						<artifactId>lombok</artifactId>
+					</excludes>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.flywaydb</groupId>
+				<artifactId>flyway-maven-plugin</artifactId>
+				<version>6.5.7</version>
+				<configuration>
+					<configFiles>
+						<configFile>src/main/resources/flyway.conf</configFile>
+					</configFiles>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

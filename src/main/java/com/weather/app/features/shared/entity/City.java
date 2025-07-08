@@ -1,7 +1,8 @@
 package com.weather.app.features.shared.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonValue;
 import jakarta.persistence.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -9,20 +10,18 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.util.TimeZone;
 import java.util.UUID;
 
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
-@Data
-@Table(name = "location")
-public class Location {
+@Table(name = "cities")
+public class City {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private long id;
 
     private String uuid = UUID.randomUUID().toString();
@@ -31,11 +30,8 @@ public class Location {
 
     private double longitude;
 
-    @Column(name = "location_name")
-    private String locationName;
-
-    @Column(name = "time_zone")
-    private String timeZone;
+    @Column(name = "city_name")
+    private String cityName;
 
     @CreationTimestamp
     @Column(name = "created_at")
@@ -47,6 +43,7 @@ public class Location {
 
     @ManyToOne
     @JoinColumn(name = "state_id", referencedColumnName = "id")
+    @JsonIgnore
     private State state;
 
     @PrePersist

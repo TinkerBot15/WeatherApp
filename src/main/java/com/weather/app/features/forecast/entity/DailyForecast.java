@@ -1,16 +1,14 @@
-package com.weather.app.features.shared.entity;
+package com.weather.app.features.forecast.entity;
 
+import com.weather.app.features.shared.entity.City;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.time.LocalDate;
-import java.util.Date;
-import java.util.TimeZone;
 import java.util.UUID;
 
 @Entity
@@ -27,8 +25,8 @@ public class DailyForecast {
     private String uuid;
 
     @ManyToOne
-    @JoinColumn(name = "location_id", referencedColumnName = "id")
-    private Location location;
+    @JoinColumn(name = "city_id", referencedColumnName = "id")
+    private City city;
 
     @OneToOne(mappedBy = "dailyForecast")
     private DailyForecastUnits dailyForecastUnits;
@@ -51,7 +49,7 @@ public class DailyForecast {
     private double rain;
 
     @Column(name="weather_code")
-    private int weather_code;
+    private int weatherCode;
 
     @CreationTimestamp
     @Column(name = "created_at")

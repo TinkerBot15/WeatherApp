@@ -1,0 +1,20 @@
+CREATE TABLE hourly_forecast_units (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    uuid VARCHAR(36) NOT NULL,
+    hourly_forecast_id BIGINT,
+    utc_offset_seconds BIGINT,
+    temperature DOUBLE,
+    time_zone VARCHAR(255),
+    time_zone_abbreviation VARCHAR(255),
+    elevation BIGINT,
+    time_unit VARCHAR(255),
+    weather_code_unit VARCHAR(255),
+    temperature_unit VARCHAR(255),
+    rain_sum_unit VARCHAR(255),
+    relative_humidity_unit VARCHAR(255),
+    cloud_cover_unit VARCHAR(255),
+    dew_point_unit VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (hourly_forecast_id) REFERENCES hourly_forecasts(id)
+);

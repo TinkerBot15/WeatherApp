@@ -1,8 +1,8 @@
 package com.weather.app.features.shared.db.seeder;
 
-import com.weather.app.features.shared.entity.Location;
+import com.weather.app.features.shared.entity.City;
 import com.weather.app.features.shared.entity.State;
-import com.weather.app.features.shared.repository.LocationRepository;
+import com.weather.app.features.shared.repository.CityRepository;
 import com.weather.app.features.shared.repository.StateRepository;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -21,10 +21,10 @@ import java.util.*;
 
 @Component
 @Order(3)
-public class LocationSeeder implements CommandLineRunner {
+public class CitySeeder implements CommandLineRunner {
 
     @Autowired
-    private LocationRepository locationRepository;
+    private CityRepository cityRepository;
 
     @Autowired
     private StateRepository stateRepository;
@@ -35,17 +35,19 @@ public class LocationSeeder implements CommandLineRunner {
         @Override
         public void run(String... args) throws Exception {
 
-            if(locationRepository.count()==0){
+            if(cityRepository.count()==0){
                 createCities();
+                System.out.println("Cities have been seeded with their coordinates");
+            }else {
                 System.out.println("Cities have been seeded with their coordinates");
             }
         }
 
         public void createCities()
         {
-            ArrayList<State> allStates = (ArrayList<State>) stateRepository.findAll();
+            List<State> allStates = stateRepository.findAll();
 
-            HashMap<String, ArrayList<String>> locations = new HashMap<>();
+            HashMap<String, ArrayList<String>> cities = new HashMap<>();
             for(State state : allStates){
 
                 String eachState = state.getStateName();
@@ -200,10 +202,10 @@ public class LocationSeeder implements CommandLineRunner {
                     eachStateCities.add("Garki");
                     eachStateCities.add("Maitama");
                 }
-                locations.put(eachState,eachStateCities);
+                cities.put(eachState,eachStateCities);
             }
 
-            for (Map.Entry<String, ArrayList<String>> entry : locations.entrySet()) {
+            for (Map.Entry<String, ArrayList<String>> entry : cities.entrySet()) {
                 String stateName = entry.getKey();
                 ArrayList<String> cityList = entry.getValue();
 
@@ -211,9 +213,9 @@ public class LocationSeeder implements CommandLineRunner {
 
                 if (state != null) {
                     for (String cityName : cityList) {
-                        Location location = new Location();
-                        location.setLocationName(cityName);
-                        location.setState(state);
+                        City city = new City();
+                        city.setCityName(cityName);
+                        city.setState(state);
 
                       HashMap<String, double[]> cityCoordinates = new HashMap<>();
 
@@ -225,9 +227,11 @@ public class LocationSeeder implements CommandLineRunner {
                         int i = 0;
                         double latitude = cityCoordinates.get(cityName)[i];
                         double longitude = cityCoordinates.get(cityName)[i+1];
-                        location.setLatitude(latitude);
-                        location.setLongitude(longitude);
-                        locationRepository.save(location);
+                        city.setLatitude(latitude);
+                        city.setLongitude(longitude);
+                        cityRepository.save(city);
+                        System.out.println("Seeded city: " + cityName + " [" + latitude + ", " + longitude + "]");
+
                     }
                 } else {
                     System.out.println("State not found: " + stateName);

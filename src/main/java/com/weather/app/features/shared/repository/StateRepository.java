@@ -1,10 +1,11 @@
 package com.weather.app.features.shared.repository;
 
 import com.weather.app.features.shared.entity.State;
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface StateRepository extends CrudRepository<State, Long> {
+public interface StateRepository extends JpaRepository<State, Long> {
     State findByStateName(String stateName);
+    State findByUuid(String uuid);
 }

@@ -1,14 +1,14 @@
-package com.weather.app.features.shared.service;
+package com.weather.app.features.forecast.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.weather.app.features.shared.entity.DailyForecast;
-import com.weather.app.features.shared.entity.DailyForecastUnits;
-import com.weather.app.features.shared.entity.Location;
-import com.weather.app.features.shared.repository.DailyForecastRepository;
-import com.weather.app.features.shared.repository.DailyForecastUnitsRepository;
-import com.weather.app.features.shared.repository.LocationRepository;
+import com.weather.app.features.forecast.entity.DailyForecast;
+import com.weather.app.features.forecast.entity.DailyForecastUnits;
+import com.weather.app.features.forecast.repository.DailyForecastRepository;
+import com.weather.app.features.forecast.repository.DailyForecastUnitsRepository;
+import com.weather.app.features.shared.entity.City;
+import com.weather.app.features.shared.repository.CityRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +22,7 @@ import java.util.ArrayList;
 public class DailyForecastService {
 
         @Autowired
-        private LocationRepository locationRepository;
+        private CityRepository cityRepository;
 
         @Autowired
         private DailyForecastRepository dailyForecastRepository;
@@ -37,9 +37,9 @@ public class DailyForecastService {
 
 
         public void fetchDailyForecastFromExternalApi() throws JsonProcessingException {
-                ArrayList<Location> locations = (ArrayList<Location>) locationRepository.findAll();
+                ArrayList<City> locations = (ArrayList<City>) cityRepository.findAll();
 
-                for (Location location : locations) {
+                for (City location : locations) {
                         double latitude = location.getLatitude();
                         double longitude = location.getLongitude();
 
@@ -57,7 +57,7 @@ public class DailyForecastService {
                 }
         }
 
-        public void saveDailyForecasts(JsonNode root, Location location) {
+        public void saveDailyForecasts(JsonNode root, City location) {
                 JsonNode daily = root.path("daily");
                 JsonNode units = root.path("daily_units");
 
@@ -67,7 +67,7 @@ public class DailyForecastService {
 
                         DailyForecast forecast = new DailyForecast();
 
-                        forecast.setLocation(location);
+                        forecast.setCity(location);
 
                         forecast.setRecordedDate(LocalDate.parse(daily.path("time").get(i).asText()));
 
@@ -81,7 +81,7 @@ public class DailyForecastService {
 
                         forecast.setRain(daily.path("rain_sum").get(i).asDouble());
 
-                        forecast.setWeather_code(daily.path("weather_code").get(i).asInt());
+                        forecast.setWeatherCode(daily.path("weather_code").get(i).asInt());
 
                         dailyForecastRepository.save(forecast);
 
