@@ -1,3 +1,4 @@
+```mermaid
 flowchart TD
     Start([START])
     
@@ -101,3 +102,4 @@ flowchart TD
     class Dir1EmpDetails,Dir2EmpDetails processStyle
     class CACDocs,Licenses docStyle
     class Start,End startEndStyle
+```
